@@ -51,4 +51,5 @@ timedatectrl
 ntpdate -q pool.ntp.org
 }
 
+setup_ntp_server
 
