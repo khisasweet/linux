@@ -1,8 +1,9 @@
 
-gwIP=""
-################### ntp server #######################
+gwIP="$1"
 
+function setup_ntp_server {
 yum install ntp -y
+echo "################### ntp server #######################"
 
 cat <<EOF>/etc/ntp.conf
 restrict default kod nomodify notrap nopeer noquery
@@ -15,16 +16,22 @@ server 2.pool.ntp.org
 server 3.pool.ntp.org
 restrict 192.168.100.0 mask 255.255.255.0 nomodify notrap
 restrict 147.175.0.0 mask 255.255.0.0 nomodify notrap
+restrict $gwIP mask 255.255.255.248 nomodify notrap
 
 driftfile /var/lib/ntp/drift
 keys /etc/ntp/keys
 <EOF>
 
 systemctl start ntpd.service
+systemctl enable ntpd.service
 ntpstat
 timedatectrl
 
-##################  ntp client ##############################
+}
+
+
+function setup_ntp_client {
+echo "##################  ntp client ##############################"
 yum install ntp -y
 cat <<EOF>/etc/ntp.conf
 restrict default kod nomodify notrap nopeer noquery
@@ -40,4 +47,8 @@ systemctl start ntpd.service
 systemctl enable ntpd.service
 ntpstat
 timedatectrl
+
+ntpdate -q pool.ntp.org
+}
+
 
